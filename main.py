@@ -73,7 +73,7 @@ async def to_es(session, data):
     _id = uuid.uuid5(uuid.NAMESPACE_URL, data['url'])
     async with session.post(f"http://{ES_URL}/{ES_INDEX}/doc/{_id}", json=data) as response:
         resp = await response.text()
-        print(resp)
+        # print(resp)
         return resp
 
 async def get_page(session, pg):
@@ -83,6 +83,7 @@ async def get_page(session, pg):
         html = await get_detail_page(session, url)
         data = extract_fields(html)
         data['url'] = gen_full_url(url)
+        print(data['url'])
         # await to_file(url, data)
 
         es_data = data
@@ -93,7 +94,7 @@ async def main():
     async with aiohttp.ClientSession() as session:
         total_page = TOTAL_PAGE or await get_total_page(session)
         stop_page = total_page - NO_PAGE if NO_PAGE else 0
-        from_page = total_page
+        from_page = total_page + 1
         wg = []
         while from_page > stop_page:
             to_page = from_page - PAGE
